@@ -1,0 +1,95 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Générateur de carte fictive</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #eef3f6;
+  color: #203744;
+  padding: 24px;
+}
+main {
+  max-width: 720px;
+  margin: auto;
+}
+form, .carte {
+  background: white;
+  border-radius: 18px;
+  padding: 22px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 18px #18374615;
+}
+label { display: block; margin-top: 12px; }
+input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+}
+.carte {
+  border: 3px solid #426c7e;
+  background: linear-gradient(135deg, #fff, #e1f0f4);
+}
+.badge {
+  padding: 12px;
+  text-align: center;
+  font-weight: bold;
+  color: #793b00;
+  background: #ffe6a0;
+  border: 2px solid #b56c19;
+}
+h1 { font-size: 1.6rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Générateur de carte fictive</h1>
+  <p>Démo graphique — aucune valeur officielle.</p>
+
+  <form id="formulaire">
+    <label>Nom
+      <input id="nom" value="DUPONT" required>
+    </label>
+    <label>Prénom
+      <input id="prenom" value="ALEX" required>
+    </label>
+    <label>Date de naissance
+      <input id="date" type="date" value="2000-01-01" required>
+    </label>
+    <button type="submit" style="margin-top:16px">
+      Actualiser la carte
+    </button>
+  </form>
+
+  <section class="carte">
+    <h2>CARTE PERSONNELLE</h2>
+    <div class="badge">
+      SPÉCIMEN — DOCUMENT FICTIF<br>
+      NON OFFICIEL — NON VALABLE COMME PIÈCE D’IDENTITÉ
+    </div>
+    <p><b>Nom :</b> <span id="sortieNom">DUPONT</span></p>
+    <p><b>Prénom :</b> <span id="sortiePrenom">ALEX</span></p>
+    <p><b>Date de naissance :</b>
+      <span id="sortieDate">01/01/2000</span></p>
+    <p><b>Identifiant de test :</b> DEMO-0000</p>
+  </section>
+</main>
+<script>
+const form = document.getElementById('formulaire');
+form.addEventListener('submit', event => {
+  event.preventDefault();
+  document.getElementById('sortieNom').textContent =
+    document.getElementById('nom').value;
+  document.getElementById('sortiePrenom').textContent =
+    document.getElementById('prenom').value;
+  const date = document.getElementById('date').value;
+  document.getElementById('sortieDate').textContent =
+    date ? date.split('-').reverse().join('/') : '—';
+});
+</script>
+</body>
+</html>
