@@ -2,94 +2,581 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Générateur de carte fictive</title>
-<style>
-body {
-  font-family: Arial, sans-serif;
-  background: #eef3f6;
-  color: #203744;
-  padding: 24px;
-}
-main {
-  max-width: 720px;
-  margin: auto;
-}
-form, .carte {
-  background: white;
-  border-radius: 18px;
-  padding: 22px;
-  margin-bottom: 20px;
-  box-shadow: 0 4px 18px #18374615;
-}
-label { display: block; margin-top: 12px; }
-input {
-  box-sizing: border-box;
-  width: 100%;
-  padding: 10px;
-  margin-top: 5px;
-}
-.carte {
-  border: 3px solid #426c7e;
-  background: linear-gradient(135deg, #fff, #e1f0f4);
-}
-.badge {
-  padding: 12px;
-  text-align: center;
-  font-weight: bold;
-  color: #793b00;
-  background: #ffe6a0;
-  border: 2px solid #b56c19;
-}
-h1 { font-size: 1.6rem; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Atlas Studio — Carte fictive</title>
+
+  <style>
+    :root {
+      --ink: #173849;
+      --teal: #176d78;
+      --muted: #557482;
+      --line: #c5dfe0;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 30px 16px;
+      font-family: system-ui, Arial, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse at 8% 12%, #d1eceb, transparent 35%),
+        radial-gradient(ellipse at 92% 88%, #dce7f6, transparent 35%),
+        #f5f8fa;
+    }
+
+    main {
+      max-width: 1080px;
+      margin: auto;
+    }
+
+    .kicker {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .22em;
+      color: var(--teal);
+      text-transform: uppercase;
+    }
+
+    h1 {
+      font-size: clamp(26px, 4vw, 38px);
+      letter-spacing: -.04em;
+      margin: 7px 0;
+    }
+
+    .lede {
+      max-width: 650px;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: 290px minmax(0, 1fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .panel,
+    .card {
+      border: 1px solid #cbdfe4;
+      border-radius: 22px;
+      background: #ffffffdf;
+      box-shadow: 0 20px 60px #17384912;
+    }
+
+    .panel {
+      padding: 22px;
+    }
+
+    .panel h2 {
+      font-size: 16px;
+      margin: 0 0 5px;
+    }
+
+    .hint,
+    .smallprint {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 750;
+      color: #355968;
+      margin: 13px 0 6px;
+    }
+
+    input {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid #c9dce1;
+      border-radius: 10px;
+      background: #fbfdfe;
+      color: var(--ink);
+      font: inherit;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 17px;
+      border: 0;
+      border-radius: 11px;
+      background: linear-gradient(120deg, #176d78, #214c70);
+      color: white;
+      padding: 12px;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    button:hover {
+      filter: brightness(1.06);
+    }
+
+    .card {
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      padding: 25px;
+      background: linear-gradient(
+        125deg, #fbffff, #eef9f7 47%, #eaf2fb
+      );
+      border-color: #b6d7db;
+      box-shadow: 0 26px 70px #183d4b20;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      width: 500px;
+      height: 500px;
+      right: -190px;
+      top: -205px;
+      border: 1px solid #9fcfd0;
+      border-radius: 50%;
+      box-shadow:
+        0 0 0 18px #b5dfe04a,
+        0 0 0 38px #b5dfe026,
+        0 0 0 62px #b5dfe018;
+    }
+
+    .card-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brandmark {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .logo {
+      width: 47px;
+      height: 47px;
+      border-radius: 16px;
+      background: linear-gradient(145deg, #176d78, #12384e);
+      display: grid;
+      place-items: center;
+      color: white;
+      font-size: 23px;
+    }
+
+    .brandname {
+      font-weight: 900;
+      letter-spacing: .04em;
+      font-size: 14px;
+    }
+
+    .brandline {
+      font-size: 11px;
+      color: #64828c;
+      margin-top: 4px;
+      letter-spacing: .08em;
+    }
+
+    .edition {
+      text-align: right;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .12em;
+      color: #397782;
+    }
+
+    .card-title {
+      font-size: clamp(22px, 3.5vw, 32px);
+      letter-spacing: -.045em;
+      margin: 18px 0 3px;
+      font-weight: 900;
+    }
+
+    .subtitle {
+      font-size: 11px;
+      color: #64828c;
+      margin-top: 4px;
+    }
+
+    .stamp {
+      margin: 18px 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 13px 10px;
+      border: 2px solid #bd633b;
+      border-radius: 13px;
+      background: linear-gradient(90deg, #fff0df, #ffe9d0);
+      color: #873d23;
+    }
+
+    .stamp strong {
+      display: block;
+      font-size: clamp(12px, 1.8vw, 16px);
+      letter-spacing: .04em;
+    }
+
+    .stamp small {
+      display: block;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: .05em;
+      margin-top: 4px;
+    }
+
+    .card-body {
+      display: grid;
+      grid-template-columns: 150px minmax(0, 1fr);
+      gap: 20px;
+    }
+
+    .portrait {
+      position: relative;
+      overflow: hidden;
+      min-height: 218px;
+      border-radius: 17px;
+      border: 1px solid #b5d5d8;
+      background: linear-gradient(150deg, #d9f0ec, #e5edf9);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .portrait::before {
+      content: "";
+      position: absolute;
+      width: 180px;
+      height: 180px;
+      border: 1px solid #94c6c7;
+      border-radius: 50%;
+      box-shadow:
+        0 0 0 12px #a9d8d43a,
+        0 0 0 28px #a9d8d426;
+    }
+
+    .person {
+      position: relative;
+      width: 112px;
+      height: 145px;
+    }
+
+    .hair {
+      position: absolute;
+      z-index: 2;
+      top: 8px;
+      left: 26px;
+      width: 62px;
+      height: 50px;
+      border-radius: 48% 48% 25% 25%;
+      background: #314e5a;
+    }
+
+    .face {
+      position: absolute;
+      top: 19px;
+      left: 30px;
+      width: 53px;
+      height: 63px;
+      border-radius: 43% 43% 48% 48%;
+      background: #d6a58c;
+      border-bottom: 3px solid #c18a75;
+    }
+
+    .neck {
+      position: absolute;
+      top: 75px;
+      left: 47px;
+      width: 22px;
+      height: 20px;
+      background: #c9937c;
+    }
+
+    .shoulders {
+      position: absolute;
+      bottom: 0;
+      left: 2px;
+      width: 108px;
+      height: 65px;
+      border-radius: 48px 48px 15px 15px;
+      background: linear-gradient(100deg, #347a83, #24536a);
+    }
+
+    .portrait-label {
+      position: relative;
+      margin-top: 5px;
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: .12em;
+      color: #477681;
+    }
+
+    .fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px 18px;
+      align-content: start;
+    }
+
+    .field {
+      padding-bottom: 9px;
+      border-bottom: 1px solid #c8dfe1;
+      min-width: 0;
+    }
+
+    .field.wide {
+      grid-column: 1 / -1;
+    }
+
+    .field label {
+      margin: 0 0 5px;
+      font-size: 9px;
+      letter-spacing: .15em;
+      color: #56828a;
+      text-transform: uppercase;
+    }
+
+    .value {
+      font-size: clamp(13px, 1.7vw, 17px);
+      font-weight: 850;
+      overflow-wrap: anywhere;
+    }
+
+    .value.large {
+      font-size: clamp(17px, 2.2vw, 23px);
+    }
+
+    .card-foot {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 12px;
+      border-top: 1px solid var(--line);
+      margin-top: 22px;
+      padding-top: 15px;
+    }
+
+    .footnote {
+      font-size: 10px;
+      line-height: 1.5;
+      color: #557883;
+    }
+
+    .serial {
+      font: 800 11px ui-monospace, monospace;
+      letter-spacing: .1em;
+      color: #34717a;
+    }
+
+    @media (max-width: 760px) {
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        padding: 18px;
+      }
+
+      .card-body {
+        grid-template-columns: 118px minmax(0, 1fr);
+        gap: 14px;
+      }
+
+      .portrait {
+        min-height: 190px;
+      }
+
+      .fields {
+        gap: 13px 12px;
+      }
+
+      .card-foot {
+        align-items: start;
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .card-body {
+        grid-template-columns: 1fr;
+      }
+
+      .portrait {
+        min-height: 150px;
+      }
+
+      .person {
+        transform: scale(.8);
+        margin-bottom: -20px;
+      }
+
+      .fields {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .value {
+        font-size: 13px;
+      }
+    }
+  </style>
 </head>
+
 <body>
 <main>
-  <h1>Générateur de carte fictive</h1>
-  <p>Démo graphique — aucune valeur officielle.</p>
+  <div class="kicker">Atelier de design · Série 01</div>
+  <h1>Atlas — carte fictive</h1>
 
-  <form id="formulaire">
-    <label>Nom
-      <input id="nom" value="DUPONT" required>
-    </label>
-    <label>Prénom
-      <input id="prenom" value="ALEX" required>
-    </label>
-    <label>Date de naissance
-      <input id="date" type="date" value="2000-01-01" required>
-    </label>
-    <button type="submit" style="margin-top:16px">
-      Actualiser la carte
-    </button>
-  </form>
+  <p class="lede">
+    Une maquette de collection au style éditorial contemporain :
+    palette profonde, détails géométriques, portrait illustré et
+    données personnalisables.
+  </p>
 
-  <section class="carte">
-    <h2>CARTE PERSONNELLE</h2>
-    <div class="badge">
-      SPÉCIMEN — DOCUMENT FICTIF<br>
-      NON OFFICIEL — NON VALABLE COMME PIÈCE D’IDENTITÉ
-    </div>
-    <p><b>Nom :</b> <span id="sortieNom">DUPONT</span></p>
-    <p><b>Prénom :</b> <span id="sortiePrenom">ALEX</span></p>
-    <p><b>Date de naissance :</b>
-      <span id="sortieDate">01/01/2000</span></p>
-    <p><b>Identifiant de test :</b> DEMO-0000</p>
-  </section>
+  <div class="workspace">
+    <form class="panel" id="editor">
+      <h2>Personnaliser la maquette</h2>
+
+      <p class="hint">
+        Modifie les exemples et actualise l’aperçu.
+        Les données restent dans ton navigateur.
+      </p>
+
+      <label for="nom">Nom fictif</label>
+      <input id="nom" value="MARTIN" maxlength="40">
+
+      <label for="prenom">Prénom fictif</label>
+      <input id="prenom" value="ÉLISE" maxlength="40">
+
+      <label for="date">Date de naissance</label>
+      <input id="date" type="date" value="2001-06-14">
+
+      <label for="ville">Ville fictive</label>
+      <input id="ville" value="VILLE EXEMPLE" maxlength="40">
+
+      <button type="submit">Actualiser l’aperçu ↗</button>
+
+      <p class="smallprint">
+        Projet graphique non officiel. Le modèle est volontairement
+        distinct d’un document d’identité réel.
+      </p>
+    </form>
+
+    <section>
+      <article class="card" aria-label="Maquette de carte fictive">
+        <div class="card-head">
+          <div class="brandmark">
+            <div class="logo">✳</div>
+            <div>
+              <div class="brandname">ATLAS STUDIO</div>
+              <div class="brandline">IDENTITÉS IMAGINAIRES</div>
+            </div>
+          </div>
+
+          <div class="edition">
+            COLLECTION<br>CRÉATIVE · 01
+          </div>
+        </div>
+
+        <div class="card-title">CARTE PERSONNELLE</div>
+        <div class="subtitle">Objet de design · Univers fictif</div>
+
+        <div class="stamp">
+          <div style="font-size:23px">✦</div>
+          <div>
+            <strong>SPÉCIMEN — DOCUMENT FICTIF</strong>
+            <small>
+              NON OFFICIEL · NON VALABLE COMME PIÈCE D’IDENTITÉ
+            </small>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <div class="portrait">
+            <div class="person">
+              <div class="hair"></div>
+              <div class="face"></div>
+              <div class="neck"></div>
+              <div class="shoulders"></div>
+            </div>
+            <div class="portrait-label">AVATAR ILLUSTRÉ</div>
+          </div>
+
+          <div class="fields">
+            <div class="field wide">
+              <label>Nom</label>
+              <div class="value large" id="outNom">MARTIN</div>
+            </div>
+
+            <div class="field wide">
+              <label>Prénom</label>
+              <div class="value large" id="outPrenom">ÉLISE</div>
+            </div>
+
+            <div class="field">
+              <label>Née le</label>
+              <div class="value" id="outDate">14/06/2001</div>
+            </div>
+
+            <div class="field">
+              <label>Ville imaginaire</label>
+              <div class="value" id="outVille">VILLE EXEMPLE</div>
+            </div>
+
+            <div class="field wide">
+              <label>Référence de démonstration</label>
+              <div class="value serial">ATLAS-DEMO-4827</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-foot">
+          <div class="footnote">
+            DESIGN ORIGINAL · DONNÉES DE TEST<br>
+            UNIVERS FICTIF · AUCUNE VALIDITÉ OFFICIELLE
+          </div>
+
+          <div class="serial">AS / 01—DEMO</div>
+        </div>
+      </article>
+
+      <p class="smallprint">
+        Pour publier : enregistre ce fichier sous <b>index.html</b>
+        dans un dépôt GitHub, puis active <b>Settings → Pages</b>.
+      </p>
+    </section>
+  </div>
 </main>
+
 <script>
-const form = document.getElementById('formulaire');
-form.addEventListener('submit', event => {
-  event.preventDefault();
-  document.getElementById('sortieNom').textContent =
-    document.getElementById('nom').value;
-  document.getElementById('sortiePrenom').textContent =
-    document.getElementById('prenom').value;
-  const date = document.getElementById('date').value;
-  document.getElementById('sortieDate').textContent =
-    date ? date.split('-').reverse().join('/') : '—';
-});
+  document.getElementById('editor').addEventListener('submit', event => {
+    event.preventDefault();
+
+    const val = id => document.getElementById(id).value.trim();
+
+    document.getElementById('outNom').textContent =
+      val('nom') || '—';
+
+    document.getElementById('outPrenom').textContent =
+      val('prenom') || '—';
+
+    document.getElementById('outVille').textContent =
+      val('ville') || '—';
+
+    const date = val('date');
+
+    document.getElementById('outDate').textContent =
+      date ? date.split('-').reverse().join('/') : '—';
+  });
 </script>
 </body>
 </html>
